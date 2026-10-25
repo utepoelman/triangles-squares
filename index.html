@@ -54,6 +54,17 @@ pre{background:#1d2433;color:#9be8b5;padding:12px;border-radius:8px;overflow:aut
 #cmsg{font-size:2cqw;max-width:78%;font-style:italic;color:#444}
 @media print{@page{size:A4 landscape;margin:0}main,#modal,#tmodal,#zoom{display:none!important}body *{visibility:hidden}#cbox,#cbox *{visibility:visible}
 #cert{position:absolute;left:0;top:0;padding:0;background:#fff;display:block}#cbox{width:297mm;height:210mm;aspect-ratio:auto}*{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+#calcbtn{position:fixed;right:14px;bottom:14px;z-index:8;box-shadow:0 2px 8px #0004;border-radius:24px}
+#calc{position:fixed;right:14px;bottom:62px;z-index:8;width:290px;max-width:calc(100vw - 28px);background:#fff;border-radius:14px;padding:10px;box-shadow:0 4px 16px #0005}
+#cdisp{background:#1d2433;color:#9be8b5;font:600 1.15rem ui-monospace,Consolas,monospace;padding:8px 10px;border-radius:8px;margin-bottom:8px;overflow:auto;min-height:5.2em}
+#cex{min-height:2.6em;word-break:break-all}#cres{text-align:right;font-size:1.7rem;min-height:2.2em;padding-top:.2em}
+.rad{white-space:nowrap}.ov{border-top:2px solid #9be8b5;padding:0 2px;margin-left:1px}.dim{opacity:.4}
+.caret{display:inline-block;width:2px;height:1.1em;background:#9be8b5;vertical-align:-3px;animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}
+#cgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}#cgrid button{padding:10px 0;font-size:1.1rem;background:#e4e8f2;color:var(--ink);border-radius:8px}
+#cgrid button.o{background:var(--a);color:#fff}#cgrid button.f{background:#f5e6b8}#cgrid button.w{grid-column:span 3}
+#cgrid button.key{margin:0;min-width:0;padding:7px 0;color:#000;background:linear-gradient(#fff,#e2e5ec);border:2px solid #777;box-shadow:0 2px 0 #aaa;font:italic 700 1.15rem Georgia,serif}
+#cgrid button.key sup{font-size:.65em}#cgrid .rt b{width:13px;height:13px;margin-left:2px;vertical-align:-1px}
+@media print{#calc,#calcbtn{display:none!important}}
 </style></head><body><main>
 <h1>Triangles &amp; Squares Investigation</h1>
 <div class="msg" id="lnk"></div>
@@ -101,6 +112,8 @@ pre{background:#1d2433;color:#9be8b5;padding:12px;border-radius:8px;overflow:aut
 </section>
 </main>
 
+<button id="calcbtn" class="hide">🧮 Calculator</button>
+<div id="calc" class="hide"><div id="cdisp"><div id="cex"></div><div id="cres"></div></div><div id="cgrid"></div></div>
 <div id="zoom" class="hide"><svg id="zsvg" viewBox="0 0 520 520"></svg></div>
 <div id="cert" class="hide"><div id="cbox"><div class="ci">
 <svg viewBox="0 0 100 120"><path d="M30 70L20 118 40 106 50 120 55 72Z" fill="#c0392b"/><path d="M70 70L80 118 60 106 50 120 45 72Z" fill="#a93226"/><circle cx="50" cy="45" r="40" fill="#e6b422" stroke="#b8860b" stroke-width="4"/><circle cx="50" cy="45" r="30" fill="#f7d96b" stroke="#b8860b" stroke-width="2"/><polygon points="50,22 56,38 73,38 59,48 64,65 50,55 36,65 41,48 27,38 44,38" fill="#b8860b"/></svg>
@@ -170,7 +183,7 @@ $('zoom').onclick=()=>$('zoom').classList.add('hide');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('zoom').classList.add('hide')});
 updLink();
 $('start').onclick=()=>{const n=$('sname').value.trim();if(!n){$('m0').textContent='Please type your name first.';return}
- studentName=n;$('s0').classList.add('hide');$('s1').classList.remove('hide');draw()};
+ studentName=n;$('calcbtn').classList.remove('hide');$('s0').classList.add('hide');$('s1').classList.remove('hide');draw()};
 /* teacher setup */
 const copy=(t,b)=>{(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).catch(()=>{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()});const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500)};
 const shareLink=()=>$('tshare').value=SHEET_URL?location.href.split(/[?#]/)[0]+'?scriptUrl='+encodeURIComponent(SHEET_URL):'Save the web app URL first…';
@@ -350,6 +363,43 @@ function showQ(){
  if(n===3)$('chk').onclick=()=>{Math.abs(val()-q[u])<=(q.r?.051:.001)?(q.n=4,q.dt=Date.now()-q.t0,score++,go()):fb(`Not quite. On your calculator press √ then ${num(ar)}.${q.r?' Round to 1 decimal place.':''}`)};
 }
 
+/* mini calculator (natural-style entry: type the expression, press =) */
+(()=>{let T=[],done=false,ans=0;
+ const keys=[['√(','key rt','√<b></b>'],['²','key','x<sup>2</sup>'],['('],[')'],['⌫','f'],['7'],['8'],['9'],['÷','o'],['AC','f'],['4'],['5'],['6'],['×','o'],['Ans','f','<i>Ans</i>'],['1'],['2'],['3'],['−','o'],['+','o'],['0'],['.'],['=','o w']];
+ const fm=v=>String(parseFloat(v.toPrecision(10))),isOp=k=>'+−×÷'.includes(k),isNum=t=>t&&/^[\d.]$/.test(t);
+ const open=()=>T.reduce((n,t)=>n+(t==='('||t==='√('?1:t===')'?-1:0),0);
+ function ev(){let i=0;
+  const prim=()=>{const t=T[i];
+   if(isNum(t)){let s='';while(isNum(T[i]))s+=T[i++];const v=parseFloat(s);if(isNaN(v))throw 0;return v}
+   if(t==='Ans'){i++;return ans}
+   if(t==='('||t==='√('){i++;const v=ex();if(T[i]===')')i++;return t==='('?v:Math.sqrt(v)}
+   throw 0};
+  const post=()=>{let v=prim();while(T[i]==='²'){i++;v*=v}return v};
+  const un=()=>{if(T[i]==='−'){i++;return -un()}if(T[i]==='+'){i++;return un()}return post()};
+  const starts=t=>t&&(isNum(t)||t==='Ans'||t==='('||t==='√(');
+  const term=()=>{let v=un();for(;;){const t=T[i];if(t==='×'){i++;v*=un()}else if(t==='÷'){i++;v/=un()}else if(starts(t))v*=un();else return v}};
+  const ex=()=>{let v=term();for(;;){const t=T[i];if(t==='+'){i++;v+=term()}else if(t==='−'){i++;v-=term()}else return v}};
+  const r=ex();if(i<T.length)throw 0;return r}
+ function render(){let h='',st=[];
+  for(const t of T){
+   if(t==='√('){h+='<span class="rad">√<span class="ov">';st.push('r')}
+   else if(t==='('){h+='(';st.push('p')}
+   else if(t===')'){const x=st.pop();h+=x==='r'?'</span></span>':')'}
+   else if(t==='²')h+='<sup>2</sup>';
+   else h+=t==='Ans'?'<i>Ans</i>':t}
+  if(!done)h+='<span class="caret"></span>';
+  while(st.length)h+=st.pop()==='r'?'</span></span>':'<span class="dim">)</span>';
+  $('cex').innerHTML=h}
+ $('cgrid').innerHTML=keys.map(k=>`<button class="${k[1]||''}" data-k="${k[0]}">${k[2]||k[0]}</button>`).join('');
+ $('cgrid').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;
+  if(k==='AC'){T=[];done=false;$('cres').textContent='';render();return}
+  if(k==='='){if(!T.length)return;try{const v=ev();if(!isFinite(v))throw 0;ans=v;$('cres').textContent=fm(v)}catch(x){$('cres').textContent='Error'}done=true;render();return}
+  if(done){done=false;$('cres').textContent='';T=isOp(k)||k==='²'?['Ans']:[]}
+  if(k==='⌫')T.pop();else if(k===')'){if(open()>0)T.push(')')}else T.push(k);
+  render()};
+ $('calcbtn').onclick=()=>$('calc').classList.toggle('hide');
+ render();
+})();
 /* finish, stats and certificate */
 let res=null;
 function finish(){
