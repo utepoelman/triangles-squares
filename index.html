@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Triangles & Squares Investigation</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1d2433;--mut:#5d6679;--a:#4f8ef7;--b:#2eaa5b;--c:#e04848;--ok:#1f9d55;--bad:#d64545}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:1.6rem;margin:.3em 0}h2{margin:.2em 0 .4em}
+section{background:var(--card);border-radius:14px;padding:18px;margin:16px 0;box-shadow:0 1px 4px #0001}
+.hide{display:none!important}
+svg{width:100%;height:auto;display:block;max-width:560px;margin:0 auto}
+.sa{fill:#4f8ef733;stroke:var(--a);stroke-width:2}.sb{fill:#2eaa5b33;stroke:var(--b);stroke-width:2}.sc{fill:#e0484833;stroke:var(--c);stroke-width:2}
+.pa{fill:#4f8ef7;fill-opacity:.4;stroke:#4f8ef7;stroke-width:2}.pb{fill:#2eaa5b;fill-opacity:.4;stroke:#2eaa5b;stroke-width:2}.pc{fill:#e04848;fill-opacity:.08;stroke:#e04848;stroke-width:2;stroke-dasharray:6 5}
+.tri{fill:#fff;stroke:var(--ink);stroke-width:2.5}.ra{fill:none;stroke:var(--ink);stroke-width:1.5}
+text{font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.ar{font-size:14px;font-weight:700}.sl{font-size:12px;fill:var(--mut)}
+.sliders{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}
+.sliders label{font-weight:600}.sliders input{width:100%}
+button{font:inherit;padding:8px 16px;border-radius:9px;border:0;background:var(--a);color:#fff;font-weight:600;cursor:pointer}
+button.sec{background:#e4e8f2;color:var(--ink)}button:disabled{opacity:.45;cursor:default}
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.sw input{display:none}.sw i{width:42px;height:24px;border-radius:12px;background:#c5cbd9;position:relative;transition:.2s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+i{background:var(--ok)}.sw input:checked+i:after{left:21px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;text-align:center}
+th,td{padding:6px 8px;border-bottom:1px solid #e3e6ee}th{background:#eef1f8}
+.nosum .sm{display:none}.sm{background:#e8f6ee}
+.msg{color:var(--mut);min-height:1.4em}
+#modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+#modal .box{background:#fff;border-radius:14px;padding:22px;max-width:520px;width:100%}
+textarea,input[type=text],input[type=number]{width:100%;font:inherit;padding:8px;border:1px solid #bbc2d3;border-radius:8px;margin:6px 0}
+.big{font-size:1.9rem;font-weight:700;text-align:center;margin:8px 0}
+.q{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
+@media(max-width:620px){.q{grid-template-columns:1fr}}
+.fb{font-weight:600;margin-top:8px}.good{color:var(--ok)}.wrong{color:var(--bad)}
+.key{display:inline-block;min-width:54px;padding:4px 12px;border:2px solid #777;border-radius:9px;background:linear-gradient(#fff,#e2e5ec);font:italic 700 1.15rem Georgia,serif;text-align:center;vertical-align:middle;margin-left:8px;box-shadow:0 2px 0 #aaa}
+.key sup{font-size:.65em}.rt b{display:inline-block;width:15px;height:15px;background:#000;margin-left:3px;vertical-align:-2px;box-shadow:0 -2px 0 #000}
+.stp{border-left:5px solid #cfd5e3;padding:8px 12px;margin:8px 0;background:#f8f9fc;border-radius:6px}.stp.off{opacity:.35}.stp.cur{border-color:#e0a000;background:#fff8e6}.stp.done{border-color:var(--ok);background:#eef8f2}
+.hl{stroke-width:5}.opb{font-size:1.5rem;min-width:56px;margin-right:8px}
+input.in[type=number]{width:90px;display:inline-block;margin:2px 4px}.tabs button{margin-right:8px}
+#zoom{position:fixed;inset:0;background:#000b;z-index:15;display:flex;align-items:center;justify-content:center;padding:12px;cursor:zoom-out}
+#zoom svg{background:#fff;border-radius:12px;width:min(96vw,96vh);max-width:none;max-height:96vh}#zsvg .ar{font-size:17px}#zsvg .sl{font-size:15px}.zm{cursor:zoom-in}
+#tmodal{position:fixed;inset:0;background:#0007;z-index:12;overflow:auto;padding:16px;display:flex;justify-content:center;align-items:flex-start}
+#tmodal .box{background:#fff;border-radius:14px;padding:20px;max-width:680px;width:100%}
+pre{background:#1d2433;color:#9be8b5;padding:12px;border-radius:8px;overflow:auto;font-size:12px;max-height:260px}
+.nn{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--a);color:#fff;text-align:center;font-weight:700;margin-right:6px}
+#cert{position:fixed;inset:0;background:#000b;overflow:auto;padding:16px;z-index:20;display:flex;flex-direction:column;align-items:center;gap:12px}
+#cbox{container-type:inline-size;width:min(900px,100%);aspect-ratio:1.414/1;background:radial-gradient(#fffef8,#fbf3da);padding:2cqw;flex:none}
+.ci{height:100%;border:1.6cqw double #c9a227;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:Georgia,'Times New Roman',serif;gap:1.2cqw;padding:2cqw}
+.ci svg{width:8cqw;max-width:none;margin:0}.ci h2{font-size:5.2cqw;color:#7a5c00;margin:0;letter-spacing:.2cqw}
+.ci .sm{font-size:2cqw;color:#555}#cname{font-size:6cqw;font-style:italic;border-bottom:.2cqw solid #c9a227;padding:0 4cqw;color:#1d2433}
+#cmsg{font-size:2cqw;max-width:78%;font-style:italic;color:#444}
+@media print{@page{size:A4 landscape;margin:0}main,#modal,#tmodal,#zoom{display:none!important}body *{visibility:hidden}#cbox,#cbox *{visibility:visible}
+#cert{position:absolute;left:0;top:0;padding:0;background:#fff;display:block}#cbox{width:297mm;height:210mm;aspect-ratio:auto}*{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style></head><body><main>
+<h1>Triangles &amp; Squares Investigation</h1>
+<div class="msg" id="lnk"></div>
+<section id="s0"><h2>Welcome</h2><p>Type your name so your teacher can see your work, then press Start.</p><input type="text" id="sname" placeholder="Your name" maxlength="60"><div class="bar"><button id="start">Start</button><button class="sec" id="tbtn">⚙ Teacher setup</button><span class="msg" id="m0"></span></div></section>
+
+<section id="s1" class="hide">
+<h2>1. Investigate</h2>
+<p>Change the shorter sides of the right-angled triangle. Watch the squares. Save different triangles in the table and look for a pattern.</p>
+<svg id="dia" viewBox="0 0 520 520" role="img" aria-label="Right-angled triangle with squares on each side"></svg>
+<div class="sliders">
+<label>Side a: <span id="av"></span><input id="a" type="range" min="1" max="8" step="0.1" value="3"></label>
+<label>Side b: <span id="bv"></span><input id="b" type="range" min="1" max="8" step="0.1" value="4"></label>
+</div>
+<div class="bar">
+<button id="save">Save this triangle</button>
+<label class="sw"><input type="checkbox" id="tog"><i></i>Show a² + b²</label>
+<button id="nb" class="sec hide">What do you notice?</button>
+<span class="msg" id="smsg"></span>
+</div>
+<div class="tw"><table id="tbl" class="nosum"><thead><tr><th>a</th><th>b</th><th>c</th><th>a²</th><th>b²</th><th>c²</th><th class="sm">a² + b²</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section id="s2" class="hide">
+<h2>2. You’ve discovered it!</h2>
+<div class="big">a² + b² = c²</div>
+<p style="text-align:center"><b>Pythagoras’ Theorem:</b> in any right-angled triangle, the area of the square on the longest side (the <i>hypotenuse</i>) equals the sum of the areas of the squares on the other two sides.</p>
+<h3>Why is it always true?</h3>
+<p>Here is the last triangle you tried. We will move the two small squares into the big one, <b>without changing their area</b>. Then use the sliders to change the triangle and run the steps again – does it always work?</p>
+<svg id="pf" viewBox="0 0 520 520"></svg>
+<div class="sliders"><label>Side a: <span id="pav"></span><input id="pa" type="range" min="1" max="8" step="0.1" value="3"></label><label>Side b: <span id="pbv"></span><input id="pb" type="range" min="1" max="8" step="0.1" value="4"></label></div>
+<p id="pft" style="min-height:6em"></p>
+<div class="bar"><button id="pn">Step 1 ▶</button><button id="pr" class="sec">Start again</button></div>
+<div class="bar"><button id="go" class="hide">Now let’s use it →</button></div>
+</section>
+
+<section id="s3" class="hide">
+<h2>3. Use the theorem</h2>
+<p>Given two sides of a right-angled triangle, you can find the third side. Each step of the calculation matches something you can see in the squares.</p>
+<h3>See it step by step</h3>
+<div class="bar tabs"><button id="m1">Find the longest side</button><button id="m2" class="sec">Find a shorter side</button></div>
+<div class="q"><div><svg id="exd" viewBox="0 0 520 520"></svg><div class="msg" style="text-align:center">🔍 Click the diagram to enlarge it</div></div><div id="exs"></div></div>
+<h3>Now you try</h3>
+<p>Same three steps, one at a time. The diagram updates as you go.</p>
+<div id="prac"></div>
+</section>
+</main>
+
+<div id="zoom" class="hide"><svg id="zsvg" viewBox="0 0 520 520"></svg></div>
+<div id="cert" class="hide"><div id="cbox"><div class="ci">
+<svg viewBox="0 0 100 120"><path d="M30 70L20 118 40 106 50 120 55 72Z" fill="#c0392b"/><path d="M70 70L80 118 60 106 50 120 45 72Z" fill="#a93226"/><circle cx="50" cy="45" r="40" fill="#e6b422" stroke="#b8860b" stroke-width="4"/><circle cx="50" cy="45" r="30" fill="#f7d96b" stroke="#b8860b" stroke-width="2"/><polygon points="50,22 56,38 73,38 59,48 64,65 50,55 36,65 41,48 27,38 44,38" fill="#b8860b"/></svg>
+<h2>Certificate of Achievement</h2><div class="sm">is proudly awarded to</div><div id="cname"></div>
+<div class="sm" id="cfor"></div><div id="cmsg"></div></div></div>
+<div class="bar"><button id="cp">🖨 Print / save as PDF</button><button class="sec" id="cc">Close</button></div></div>
+<div id="tmodal" class="hide"><div class="box">
+<h2>⚙ Teacher setup: send student work to your spreadsheet</h2>
+<p><span class="nn">1</span><b>Create a Google Sheet and add the script</b></p>
+<ol><li>Create a new Google Sheet (e.g. “Triangles &amp; Squares – Class Results”).</li><li>Click <b>Extensions → Apps Script</b>.</li><li>Delete any existing code and paste the script below.</li></ol>
+<div class="bar"><button class="sec" id="tcopy">Copy script</button></div>
+<pre id="gs">function safe(v){v=String(v==null?'':v);return /^[=+\-@]/.test(v)?"'"+v:v}
+function doPost(e){
+  try{
+    var d=JSON.parse(e.postData.contents),ss=SpreadsheetApp.getActiveSpreadsheet();
+    var cfg={
+      observation:['Observations',['Time','Student name','What I notice','Triangles saved (a, b, c; a2, b2, c2)']],
+      practice:['Practice results',['Time','Student name','Questions correct','Out of','Unsuccessful attempts (total)','Total working time','Unsuccessful: step 1 (squaring)','Unsuccessful: step 2 (+ or -)','Unsuccessful: step 3 (square root)','Details per question']],
+      test:['Test',['Time','Student name','Message']]};
+    var c=cfg[d.type]; if(!c) throw new Error('Unknown type');
+    var sh=ss.getSheetByName(c[0])||ss.insertSheet(c[0]);
+    if(sh.getLastRow()===0){sh.appendRow(c[1]);sh.setFrozenRows(1);}
+    var r={
+      observation:[safe(d.studentName),safe(d.observation),safe(d.table)],
+      practice:[safe(d.studentName),d.correct,d.total,d.unsuccessful,safe(d.time),d.step1,d.step2,d.step3,safe(d.detail)],
+      test:[safe(d.studentName),'Connection OK']};
+    sh.appendRow([new Date()].concat(r[d.type]));
+    return ContentService.createTextOutput('ok');
+  }catch(err){return ContentService.createTextOutput('error: '+err);}
+}
+function doGet(){return ContentService.createTextOutput('Triangles and Squares web app is active.');}</pre>
+<p><span class="nn">2</span><b>Deploy as a web app</b></p>
+<ul><li>In Apps Script click <b>Deploy → New deployment</b>, choose type <b>Web app</b>.</li><li>Execute as: <b>Me</b>. Who has access: <b>Anyone</b> (essential for student submissions).</li><li>Click <b>Deploy</b>, authorise access, and copy the <b>Web app URL</b>. (If you edit the script later, create a new deployment.)</li></ul>
+<p><span class="nn">3</span><b>Paste and test the URL</b></p>
+<input type="text" id="turl" placeholder="https://script.google.com/macros/s/.../exec">
+<div class="bar"><button id="tsave">Save URL</button><button class="sec" id="ttest">Send test entry</button></div>
+<div class="msg" id="tst"></div>
+<p><span class="nn">4</span><b>Share the student link</b></p>
+<p>This link has your spreadsheet connection built in. Students only need to type their name.</p>
+<input type="text" id="tshare" readonly><div class="bar"><button class="sec" id="tcopy2">Copy link</button></div>
+<p><small>Note: the link only works for students if this HTML file is hosted at a web address (e.g. your school website, GitHub Pages or Netlify Drop). If you just open the file from your computer, the link starts with file:// and won’t work on other devices. You can also hard-code your URL in <code>DEFAULT_SHEET_URL</code> near the top of the script.</small></p>
+<div class="bar"><button id="tcl">Done</button></div>
+</div></div>
+<div id="modal" class="hide"><div class="box">
+<h2>What do you notice?</h2>
+<p>Look at the numbers in your table. Describe any pattern you can see.</p>
+<textarea id="obs" rows="5" placeholder="I notice that…"></textarea>
+<div class="bar"><button id="sub">Submit</button><button id="cl" class="sec">Not yet</button><span class="msg" id="mm"></span></div>
+</div></div>
+
+<script>
+/* ===== TEACHER SETTINGS ===== */
+const DEFAULT_SHEET_URL='';   // optional: paste your Google Apps Script web app URL here instead of using the Teacher setup screen
+let SHEET_URL='',studentName='',pt0=0;
+const MIN_ROWS=6;     // triangles saved before the “What do you notice?” button appears
+const AUTO_ROWS=10;  // triangles saved before the question pops up by itself (set very high to never auto-pop)
+/* ============================ */
+const $=i=>document.getElementById(i),f=(x,d=1)=>(+x).toFixed(d);
+let rows=[],asked=false;
+try{const u=new URLSearchParams(location.search).get('scriptUrl');if(u){SHEET_URL=u;localStorage.setItem('tsi_url',u)}else SHEET_URL=localStorage.getItem('tsi_url')||''}catch(e){}
+if(!SHEET_URL)SHEET_URL=DEFAULT_SHEET_URL;
+const send=async p=>{if(!SHEET_URL)return false;try{await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)});return true}catch(e){return false}};
+const updLink=()=>$('lnk').textContent=SHEET_URL?'🟢 Linked to your class spreadsheet':'⚪ Not linked to a spreadsheet (your work stays on this device)';
+const mmss=ms=>{const t=Math.round(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+function zoomable(el){el.classList.add('zm');el.onclick=()=>{$('zsvg').innerHTML=el.innerHTML;$('zoom').classList.remove('hide')}}
+$('zoom').onclick=()=>$('zoom').classList.add('hide');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('zoom').classList.add('hide')});
+updLink();
+$('start').onclick=()=>{const n=$('sname').value.trim();if(!n){$('m0').textContent='Please type your name first.';return}
+ studentName=n;$('s0').classList.add('hide');$('s1').classList.remove('hide');draw()};
+/* teacher setup */
+const copy=(t,b)=>{(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).catch(()=>{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()});const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500)};
+const shareLink=()=>$('tshare').value=SHEET_URL?location.href.split(/[?#]/)[0]+'?scriptUrl='+encodeURIComponent(SHEET_URL):'Save the web app URL first…';
+$('tbtn').onclick=()=>{$('turl').value=SHEET_URL;shareLink();$('tmodal').classList.remove('hide')};
+$('tcl').onclick=()=>$('tmodal').classList.add('hide');
+$('tcopy').onclick=()=>copy($('gs').textContent,$('tcopy'));$('tcopy2').onclick=()=>copy($('tshare').value,$('tcopy2'));
+$('tsave').onclick=()=>{const u=$('turl').value.trim();
+ if(u&&!u.startsWith('https://script.google.com/macros/s/')){$('tst').textContent='That doesn’t look right: the URL should start with https://script.google.com/macros/s/';return}
+ SHEET_URL=u;try{u?localStorage.setItem('tsi_url',u):localStorage.removeItem('tsi_url')}catch(e){}
+ updLink();shareLink();$('tst').textContent=u?'Saved. Student work will now go to your sheet.':'Link removed.'};
+$('ttest').onclick=async()=>{if(!SHEET_URL){$('tst').textContent='Save the URL first.';return}
+ await send({type:'test',studentName:'Test (teacher)'});$('tst').textContent='Test sent. Check your sheet for a “Test” tab (it can take a few seconds).'};
+
+/* ---------- Phase 1: investigation diagram ---------- */
+const S=19,C={x:182,y:334};
+const P=(x,y)=>[C.x+x*S,C.y+y*S];
+const poly=(v,cl)=>`<polygon class="${cl}" points="${v.map(p=>P(...p).join(',')).join(' ')}"/>`;
+const tx=(x,y,s,cl,dx=0,dy=0)=>{const p=P(x,y);return `<text class="${cl}" x="${p[0]+dx}" y="${p[1]+dy}">${s}</text>`};
+function vals(){const a=+$('a').value,b=+$('b').value;return{a,b,c:Math.hypot(a,b)}}
+function draw(){
+ const{a,b,c}=vals(),A=[0,-b],B=[a,0];
+ $('av').textContent=f(a);$('bv').textContent=f(b);
+ let h=poly([[0,0],[a,0],[a,a],[0,a]],'sa')+poly([[0,0],A,[-b,-b],[-b,0]],'sb')+poly([A,B,[a+b,-a],[b,-a-b]],'sc')
+ +poly([[0,0],A,B],'tri')+`<path class="ra" d="M${C.x+10} ${C.y}V${C.y-10}H${C.x}"/>`
+ +tx(a/2,a/2,'a² = '+f(a*a,2),'ar')+tx(-b/2,-b/2,'b² = '+f(b*b,2),'ar')
+ +tx((a+b)/2,-(a+b)/2,'c² = '+f(a*a+b*b,2),'ar')
+ +tx(a/2,0,'a = '+f(a),'sl',0,13)+tx(0,-b/2,'b = '+f(b),'sl',-27,0)
+ +tx(a/2,-b/2,'c = '+f(c,2),'sl',14*b/c*2.2,-14*a/c*2.2);
+ if($('tog').checked)h+=`<text x="260" y="24" style="font-size:18px;font-weight:700;fill:#1f9d55">a² + b² = ${f(a*a,2)} + ${f(b*b,2)} = ${f(a*a+b*b,2)}</text>`;
+ $('dia').innerHTML=h;
+}
+['a','b'].forEach(i=>$(i).oninput=draw);
+$('tog').onchange=()=>{$('tbl').classList.toggle('nosum',!$('tog').checked);draw()};
+function renderTable(){
+ $('tbl').tBodies[0].innerHTML=rows.map(r=>`<tr><td>${f(r.a)}</td><td>${f(r.b)}</td><td>${f(r.c,2)}</td><td>${f(r.a*r.a,2)}</td><td>${f(r.b*r.b,2)}</td><td>${f(r.c*r.c,2)}</td><td class="sm">${f(r.a*r.a+r.b*r.b,2)}</td></tr>`).join('');
+}
+$('save').onclick=()=>{
+ const v=vals();
+ if(rows.some(r=>r.a===v.a&&r.b===v.b)){$('smsg').textContent='You already saved that triangle – try a different one.';return}
+ rows.push(v);renderTable();
+ $('smsg').textContent=rows.length<MIN_ROWS?`${rows.length} saved. Keep exploring – try very different triangles, and try the switch!`:`${rows.length} saved. Keep exploring, or click “What do you notice?” when you’re ready.`;
+ if(rows.length>=MIN_ROWS)$('nb').classList.remove('hide');
+ if(rows.length>=AUTO_ROWS&&!asked){asked=true;$('modal').classList.remove('hide')}
+};
+$('nb').onclick=()=>{asked=true;$('modal').classList.remove('hide')};
+$('cl').onclick=()=>$('modal').classList.add('hide');
+$('sub').onclick=async()=>{
+ const o=$('obs').value.trim();
+ if(o.length<8){$('mm').textContent='Please write a little more.';return}
+ $('mm').textContent='Sending…';
+ const tbl=rows.map(r=>`(${f(r.a)}, ${f(r.b)}, ${f(r.c,2)}; ${f(r.a*r.a,2)}, ${f(r.b*r.b,2)}, ${f(r.c*r.c,2)})`).join(' | ');
+ await send({type:'observation',studentName,observation:o,table:tbl});
+ $('modal').classList.add('hide');
+ $('s2').classList.remove('hide');$('pa').value=$('a').value;$('pb').value=$('b').value;syncPf();resetPf();$('s2').scrollIntoView({behavior:'smooth'});
+};
+
+/* ---------- Phase 2: shearing proof (uses the student's triangle) ---------- */
+const SS=19,CC={x:182,y:334},O=[0,0];
+const ad=(u,v)=>[u[0]+v[0],u[1]+v[1]],mn=(u,v)=>[u[0]-v[0],u[1]-v[1]];
+let ta,tb,An,Bn,N,D,DN,KA,KB;
+/* each list = the parallelogram's corners at: start, after step 1, after step 2, after step 3 */
+function setTri(a,b){ta=a;tb=b;An=[0,-b];Bn=[a,0];N=[b,-a];const kk=b*b/(a*a+b*b);
+ D=[An[0]+kk*a,An[1]+kk*b];DN=ad(D,N);
+ KA=[[O,Bn,[a,a],[0,a]],[O,Bn,mn(Bn,N),mn(O,N)],[DN,Bn,mn(Bn,N),D],[DN,ad(Bn,N),Bn,D]];
+ KB=[[O,An,[-b,-b],[-b,0]],[O,An,mn(An,N),mn(O,N)],[DN,An,mn(An,N),D],[DN,ad(An,N),An,D]]}
+function syncPf(){setTri(+$('pa').value,+$('pb').value);$('pav').textContent=f(ta);$('pbv').textContent=f(tb)}
+const lerp=(u,v,t)=>u.map((p,i)=>[p[0]+(v[i][0]-p[0])*t,p[1]+(v[i][1]-p[1])*t]);
+const pose=(K,p)=>{const s=Math.min(2,Math.floor(p));return lerp(K[s],K[s+1],p-s)};
+const Q=v=>[CC.x+v[0]*SS,CC.y+v[1]*SS];
+const pp=v=>v.map(p=>Q(p).join(',')).join(' ');
+const cen=v=>{const m=v.reduce((s,p)=>[s[0]+p[0],s[1]+p[1]],[0,0]);return Q([m[0]/4,m[1]/4])};
+const ln=(u,v)=>{const a=Q(u),b=Q(v);return `x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"`};
+function pfDraw(p){
+ const pa=pose(KA,p),pb=pose(KB,p),ca=cen(pa),cb=cen(pb),r=Q(O),tp=Q(ad(An,N));
+ $('pf').innerHTML=`<polygon class="pc" points="${pp([An,Bn,ad(Bn,N),ad(An,N)])}"/>
+ <polygon points="${pp(KA[0])}" fill="none" stroke="#4f8ef7" stroke-dasharray="2 4"/><polygon points="${pp(KB[0])}" fill="none" stroke="#2eaa5b" stroke-dasharray="2 4"/>
+ <line ${ln(mn(O,N),DN)} stroke="#555" stroke-width="1.5" stroke-dasharray="3 4"/>
+ <polygon class="pa" points="${pp(pa)}"/><polygon class="pb" points="${pp(pb)}"/>
+ <polygon points="${pp([O,An,Bn])}" fill="none" stroke="#1d2433" stroke-width="3" stroke-linejoin="round"/>
+ <path class="ra" d="M${r[0]+10} ${r[1]}V${r[1]-10}H${r[0]}"/>
+ <text class="ar" x="${ca[0]}" y="${ca[1]}">a² = ${f(ta*ta,2)}</text><text class="ar" x="${cb[0]}" y="${cb[1]}">b² = ${f(tb*tb,2)}</text>
+ <text class="ar" x="${tp[0]}" y="${Math.max(14,tp[1]-14)}" style="fill:#e04848">c² = ${f(ta*ta+tb*tb,2)}</text>`;
+}
+const T=['Start: the squares on the two shorter sides – a² (blue) and b² (green). The red dashed square is on the hypotenuse. The dotted line is the altitude from the right angle, extended through the big square.',
+ 'Step 1 – SHEAR. Slide the outside edge of each small square towards the extended altitude until a vertex of each lands on it, at the same point. The base stays put and the height is unchanged, so the area is unchanged.',
+ 'Step 2 – SHEAR along the altitude. Keep the side on the edge of the big square fixed, and slide the parallelograms along the altitude direction until a vertex meets the outside edge of the big square. Base and height are unchanged again, so the area is still the same.',
+ 'Step 3 – SHEAR in the same direction. Now slide the opposite sides the same way. Base and height are unchanged once more, so the area is unchanged – and the parallelograms become rectangles that sit exactly on the big square. So a² + b² = c² !'];
+let stage=0,busy=false;
+function resetPf(){stage=0;busy=false;pfDraw(0);$('pft').textContent=T[0];$('pn').textContent='Step 1 ▶';$('pn').disabled=false;$('go').classList.add('hide')}
+$('pr').onclick=resetPf;
+$('pa').oninput=$('pb').oninput=()=>{syncPf();if(!busy)pfDraw(stage)};
+syncPf();
+$('pn').onclick=()=>{
+ if(busy||stage>=3)return;busy=true;const s0=stage,t0=performance.now();
+ (function fr(t){const u=Math.min(1,(t-t0)/1800),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+  pfDraw(s0+e);
+  if(u<1)requestAnimationFrame(fr);else{stage=s0+1;busy=false;pfDraw(stage);
+   $('pft').textContent=T[stage];
+   if(stage<3)$('pn').textContent=`Step ${stage+1} ▶`;else{$('pn').disabled=true;$('pn').textContent='Done';$('go').classList.remove('hide')}}})(t0);
+};
+$('go').onclick=()=>{$('s3').classList.remove('hide');$('s3').scrollIntoView({behavior:'smooth'});startPrac()};
+
+/* ---------- Phase 3: guided use of the theorem ---------- */
+const num=x=>String(Math.round(x*100)/100),num2=(q,k)=>q.r&&k===q.u?String(Math.round(q[k]*10)/10):num(q[k]);
+const sqK='<span class="key"><i>x</i><sup>2</sup></span>',rtK='<span class="key rt">√<b></b></span>';
+function drawSq(a,b,L){
+ const c=Math.hypot(a,b),s=Math.min(440/(a+2*b),440/(2*a+b),30),
+ ox=(520-(a+2*b)*s)/2+b*s,oy=(520-(2*a+b)*s)/2+(a+b)*s,p=(x,y)=>[ox+x*s,oy+y*s],
+ pl=(v,cl,h)=>`<polygon class="${cl}${h?' hl':''}" points="${v.map(q=>p(...q).join(',')).join(' ')}"/>`,
+ t=(x,y,str,cl,dx=0,dy=0)=>{const q=p(x,y);return `<text class="${cl}" x="${q[0]+dx}" y="${q[1]+dy}">${str}</text>`},
+ A=[0,-b],B=[a,0],h=k=>L.hl.includes(k);
+ return pl([[0,0],[a,0],[a,a],[0,a]],'sa',h('a'))+pl([[0,0],A,[-b,-b],[-b,0]],'sb',h('b'))+pl([A,B,[a+b,-a],[b,-a-b]],'sc',h('c'))
+ +pl([[0,0],A,B],'tri')+`<path class="ra" d="M${ox+10} ${oy}V${oy-10}H${ox}"/>`
+ +t(a/2,a/2,L.aa,'ar')+t(-b/2,-b/2,L.ab,'ar')+t((a+b)/2,-(a+b)/2,L.ac,'ar')
+ +t(a/2,0,L.sa,'sl',0,13)+t(0,-b/2,L.sb,'sl',-27,0)+t(a/2,-b/2,L.sc,'sl',30*b/c,-30*a/c);
+}
+/* st = steps completed (0-3); act = step being worked on / shown */
+function lab(q,st,act){
+ const ks=['a','b','c'].filter(k=>k!==q.u),L={hl:act===1?ks:(act===2||act===3)?[q.u]:[]};
+ ['a','b','c'].forEach(k=>{const kn=k!==q.u;
+  L['s'+k]=k+' = '+(kn||st>=3?num2(q,k):'?');
+  L['a'+k]=k+'² = '+((kn&&st>=1)||st>=2?num(q[k]*q[k]):'?')});
+ return L}
+function stepHTML(q,n){
+ const u=q.u,ks=['a','b','c'].filter(k=>k!==u),o=u==='a'?'b':'a',sq=k=>num(q[k]*q[k]),ar=num(q[u]*q[u]);
+ if(n===1)return `<b>Step 1</b> ‘Square’ the given sides. ${sqK}<br>${ks.map(k=>`${k}² = ${q[k]} × ${q[k]} = <b>${sq(k)}</b>`).join(' &nbsp; ')}<br><small>This is the area of the square on each given side.</small>`;
+ if(n===2)return u==='c'?`<b>Step 2</b> + (to calculate the longest side)<br>c² = a² + b² = ${sq('a')} + ${sq('b')} = <b>${ar}</b><br><small>The two small squares together are as big as the big square, so we <b>add</b>.</small>`
+  :`<b>Step 2</b> − (to calculate a shorter side)<br>${u}² = c² − ${o}² = ${sq('c')} − ${sq(o)} = <b>${ar}</b><br><small>The big square is made up of the two small squares, so take away the small square you know to find the one you don’t.</small>`;
+ return `<b>Step 3</b> Take the square root. ${rtK}<br>${u} ${q.r?'≈':'='} √${ar} = <b>${num2(q,u)}</b><br><small>The area of a square is side × side. The square root takes us from the area back to the side length.</small>`}
+
+/* worked example */
+let exq={a:6,b:8,c:10,u:'c'},exn=0;
+function exShow(){
+ $('exd').innerHTML=drawSq(exq.a,exq.b,lab(exq,exn,exn));zoomable($('exd'));
+ $('m1').className=exq.u==='c'?'':'sec';$('m2').className=exq.u==='c'?'sec':'';
+ $('exs').innerHTML=[1,2,3].map(i=>`<div class="stp ${exn>=i?(exn===i?'cur':'done'):'off'}">${exn>=i?stepHTML(exq,i):`<b>Step ${i}</b> …`}</div>`).join('')
+ +`<div class="bar"><button id="exn" ${exn>=3?'disabled':''}>${exn?'Next step ▶':'Show Step 1 ▶'}</button><button class="sec" id="exr">Start again</button></div>`;
+ $('exn').onclick=()=>{exn++;exShow()};$('exr').onclick=()=>{exn=0;exShow()};
+}
+$('m1').onclick=()=>{exq={a:6,b:8,c:10,u:'c'};exn=0;exShow()};
+$('m2').onclick=()=>{exq={a:6,b:8,c:10,u:'a'};exn=0;exShow()};
+
+/* guided practice */
+let qs=[],qi=0,score=0;
+const pick=a=>a[Math.random()*a.length|0],ri=(m,x)=>m+(Math.random()*(x-m+1)|0);
+function startPrac(){
+ exShow();if(qs.length)return;
+ const Tr=[[3,4,5],[5,12,13],[8,15,17],[6,8,10]];
+ for(let i=0;i<2;i++){const t=pick(Tr);qs.push({a:t[0],b:t[1],c:t[2],u:'c'})}
+ for(let i=0;i<2;i++){const a=ri(2,12),b=ri(2,12);qs.push({a,b,c:Math.hypot(a,b),u:'c',r:1})}
+ for(let i=0;i<2;i++){const t=pick(Tr);qs.push({a:t[0],b:t[1],c:t[2],u:pick(['a','b'])})}
+ {const c=ri(9,16),a=ri(3,c-3);qs.push({a,b:Math.sqrt(c*c-a*a),c,u:'b',r:1})}
+ {const L=ri(5,8),d=ri(2,3);qs.push({a:d,b:Math.sqrt(L*L-d*d),c:L,u:'b',r:1,ctx:`A ${L} m ladder leans against a vertical wall. Its foot is ${d} m from the wall. How high up the wall does it reach?`})}
+ qs.forEach(q=>q.f=[0,0,0]);qi=0;score=0;showQ();
+}
+function showQ(){
+ if(qi>=qs.length){finish();return}
+ const q=qs[qi];if(!q.t0)q.t0=Date.now();const n=q.n||1,u=q.u,o=u==='a'?'b':'a',ks=['a','b','c'].filter(k=>k!==u),ar=q[u]*q[u],sq=k=>num(q[k]*q[k]);
+ let h=`<p><b>Question ${qi+1} of ${qs.length}</b></p><div class="q"><div><svg id="qd" viewBox="0 0 520 520"></svg><div class="msg" style="text-align:center">🔍 Click the diagram to enlarge it</div></div><div>`
+ +(q.ctx?`<p>${q.ctx}<br><small>(a = distance from the wall, b = height up the wall, c = ladder)</small></p>`:`<p>Find the side marked <b>?</b>${q.r?' (round to 1 decimal place)':''}.</p>`);
+ for(let i=1;i<n&&i<=3;i++)h+=`<div class="stp done">${stepHTML(q,i)}</div>`;
+ if(n===1)h+=`<div class="stp cur"><b>Step 1</b> ‘Square’ the given sides. ${sqK}<br>${ks.map(k=>`${k}² = <input class="in" type="number" step="any" data-k="${k}">`).join(' ')}<div class="bar"><button id="chk">Check</button></div></div>`;
+ if(n===2)h+=`<div class="stp cur"><b>Step 2</b> Add or subtract?<br>`+(!q.op?`Is the unknown square the biggest one? Choose <b>+</b> (to calculate the longest side) or <b>−</b> (to calculate a shorter side).<div class="bar"><button class="opb" data-op="+">+</button><button class="opb" data-op="−">−</button></div>`
+  :`${u==='c'?`c² = a² + b² = ${sq('a')} + ${sq('b')}`:`${u}² = c² − ${o}² = ${sq('c')} − ${sq(o)}`} = <input class="in" type="number" step="any" id="v"><div class="bar"><button id="chk">Check</button></div>`)+`</div>`;
+ if(n===3)h+=`<div class="stp cur"><b>Step 3</b> Take the square root. ${rtK}<br>${u} = √${num(ar)} = <input class="in" type="number" step="any" id="v"> ${q.r?'(1 d.p.)':''}<div class="bar"><button id="chk">Check</button></div></div>`;
+ if(n===4)h+=`<div class="fb good">✓ ${u} ${q.r?'≈':'='} ${num2(q,u)}</div><div class="bar"><button id="nx">${qi<qs.length-1?'Next question ▶':'Finish'}</button></div>`;
+ h+=`<div class="fb" id="fb"></div></div></div>`;
+ $('prac').innerHTML=h;
+ $('qd').innerHTML=drawSq(q.a,q.b,lab(q,n>3?3:n-1,n>3?0:n));zoomable($('qd'));
+ const fb=t=>{q.f[n-1]++;$('fb').className='fb wrong';$('fb').textContent=t},go=()=>showQ(),val=()=>parseFloat($('v').value);
+ if($('nx'))$('nx').onclick=()=>{qi++;showQ()};
+ if(n===1)$('chk').onclick=()=>{
+  if(ks.every(k=>Math.abs(+document.querySelector(`[data-k="${k}"]`).value-q[k]*q[k])<.01)){q.n=2;go()}else fb('Not quite. The area of a square is its side × side, e.g. 5² = 5 × 5. Use the x² key.')};
+ if(n===2&&!q.op)document.querySelectorAll('.opb').forEach(b=>b.onclick=()=>{
+  if(b.dataset.op===(u==='c'?'+':'−')){q.op=1;go()}else fb(u==='c'?'Look at the diagram: the square on the longest side is the biggest – the two small squares add up to it.':'You are looking for a smaller square. Start with the big square and take away the small square you already know.')});
+ if(n===2&&q.op)$('chk').onclick=()=>{Math.abs(val()-ar)<.01?(q.n=3,go()):fb('Not quite. Check your calculation with the calculator.')};
+ if(n===3)$('chk').onclick=()=>{Math.abs(val()-q[u])<=(q.r?.051:.001)?(q.n=4,q.dt=Date.now()-q.t0,score++,go()):fb(`Not quite. On your calculator press √ then ${num(ar)}.${q.r?' Round to 1 decimal place.':''}`)};
+}
+
+/* finish, stats and certificate */
+let res=null;
+function finish(){
+ if(res)return;
+ const sm=i=>qs.reduce((t,q)=>t+q.f[i],0),fails=sm(0)+sm(1)+sm(2),tm=qs.reduce((t,q)=>t+(q.dt||0),0);
+ res={correct:score,total:qs.length,fails};
+ $('prac').innerHTML=`<div class="big">You answered ${score} out of ${qs.length} questions correctly.</div><p id="sent" class="msg" style="text-align:center"></p><div class="bar" style="justify-content:center"><button id="cb">🏅 Claim your certificate</button></div>`;
+ $('cb').onclick=openCert;
+ send({type:'practice',studentName,correct:score,total:qs.length,unsuccessful:fails,time:mmss(tm),step1:sm(0),step2:sm(1),step3:sm(2),
+  detail:qs.map((q,i)=>`Q${i+1} (find ${q.u}): ${q.f[0]+q.f[1]+q.f[2]} unsuccessful, ${Math.round((q.dt||0)/1000)}s`).join(' | ')})
+ .then(ok=>{if(ok)$('sent').textContent='Your results have been sent to your teacher.'});
+}
+function openCert(){
+ const f=res.fails;
+ $('cname').textContent=studentName;
+ $('cfor').textContent=`for correctly solving ${res.correct} out of ${res.total} right-angled triangle problems`;
+ $('cmsg').textContent=f===0?'Outstanding! Every step was right on the first attempt – brilliant accuracy and clear mathematical thinking.'
+  :f<5?'Great work! You noticed what needed fixing and put it right – that is exactly how mathematicians learn.'
+  :'What perseverance! You kept going through the tricky moments, learned from every attempt and solved every problem. That determination is a real mathematical strength.';
+ $('cert').classList.remove('hide');
+}
+$('cp').onclick=()=>window.print();$('cc').onclick=()=>$('cert').classList.add('hide');
+draw();
+</script></body></html>
