@@ -65,6 +65,8 @@ pre{background:#1d2433;color:#9be8b5;padding:12px;border-radius:8px;overflow:aut
 #cgrid button.key{margin:0;min-width:0;padding:7px 0;color:#000;background:linear-gradient(#fff,#e2e5ec);border:2px solid #777;box-shadow:0 2px 0 #aaa;font:italic 700 1.15rem Georgia,serif}
 #cgrid button.key sup{font-size:.65em}#cgrid .rt b{width:13px;height:13px;margin-left:2px;vertical-align:-1px}
 @media print{#calc,#calcbtn{display:none!important}}
+#chandle{display:flex;justify-content:space-between;align-items:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;background:#eef1f8;border-radius:8px;padding:4px 6px 4px 10px;margin-bottom:8px;font-size:.85rem;font-weight:600;color:var(--mut)}
+#chandle:active{cursor:grabbing}#cx{padding:2px 9px;background:#e4e8f2;color:var(--ink);border-radius:6px}
 </style></head><body><main>
 <h1>Triangles &amp; Squares Investigation</h1>
 <div class="msg" id="lnk"></div>
@@ -113,7 +115,7 @@ pre{background:#1d2433;color:#9be8b5;padding:12px;border-radius:8px;overflow:aut
 </main>
 
 <button id="calcbtn" class="hide">🧮 Calculator</button>
-<div id="calc" class="hide"><div id="cdisp"><div id="cex"></div><div id="cres"></div></div><div id="cgrid"></div></div>
+<div id="calc" class="hide"><div id="chandle"><span>⠿ Calculator – drag to move</span><button id="cx" aria-label="Close calculator">✕</button></div><div id="cdisp"><div id="cex"></div><div id="cres"></div></div><div id="cgrid"></div></div>
 <div id="zoom" class="hide"><svg id="zsvg" viewBox="0 0 520 520"></svg></div>
 <div id="cert" class="hide"><div id="cbox"><div class="ci">
 <svg viewBox="0 0 100 120"><path d="M30 70L20 118 40 106 50 120 55 72Z" fill="#c0392b"/><path d="M70 70L80 118 60 106 50 120 45 72Z" fill="#a93226"/><circle cx="50" cy="45" r="40" fill="#e6b422" stroke="#b8860b" stroke-width="4"/><circle cx="50" cy="45" r="30" fill="#f7d96b" stroke="#b8860b" stroke-width="2"/><polygon points="50,22 56,38 73,38 59,48 64,65 50,55 36,65 41,48 27,38 44,38" fill="#b8860b"/></svg>
@@ -397,7 +399,17 @@ function showQ(){
   if(done){done=false;$('cres').textContent='';T=isOp(k)||k==='²'?['Ans']:[]}
   if(k==='⌫')T.pop();else if(k===')'){if(open()>0)T.push(')')}else T.push(k);
   render()};
- $('calcbtn').onclick=()=>$('calc').classList.toggle('hide');
+ $('calcbtn').onclick=()=>{$('calc').classList.toggle('hide');clampCalc()};
+ $('cx').onclick=()=>$('calc').classList.add('hide');
+ const cb=$('calc'),hd=$('chandle');let dx=0,dy=0,drag=false;
+ function clampCalc(){if(cb.classList.contains('hide')||!cb.style.left)return;
+  const r=cb.getBoundingClientRect();cb.style.left=Math.max(0,Math.min(innerWidth-r.width,r.left))+'px';cb.style.top=Math.max(0,Math.min(innerHeight-r.height,r.top))+'px'}
+ hd.onpointerdown=e=>{if(e.target.closest('button'))return;const r=cb.getBoundingClientRect();dx=e.clientX-r.left;dy=e.clientY-r.top;drag=true;hd.setPointerCapture(e.pointerId);
+  cb.style.right=cb.style.bottom='auto';cb.style.left=r.left+'px';cb.style.top=r.top+'px'};
+ hd.onpointermove=e=>{if(!drag)return;const r=cb.getBoundingClientRect();
+  cb.style.left=Math.max(0,Math.min(innerWidth-r.width,e.clientX-dx))+'px';cb.style.top=Math.max(0,Math.min(innerHeight-r.height,e.clientY-dy))+'px'};
+ hd.onpointerup=hd.onpointercancel=()=>{drag=false};
+ addEventListener('resize',clampCalc);
  render();
 })();
 /* finish, stats and certificate */
